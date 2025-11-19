@@ -162,6 +162,7 @@ class _LaporanBaruPageState extends State<LaporanBaruPage> {
               const SizedBox(height: 12),
 
               Center(
+                
                 child: ElevatedButton.icon(
                   onPressed: _isGettingLocation ? null : _getCurrentLocation,
                   icon: const Icon(Icons.my_location),
