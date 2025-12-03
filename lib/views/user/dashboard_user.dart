@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
+import '../../config.dart';
 import 'package:audioplayers/audioplayers.dart';
 import '../../widgets/custom_navbar_user.dart';
 import '../../widgets/custom_sidebar_user.dart';
@@ -39,8 +40,14 @@ class _DashboardUserState extends State<DashboardUser> {
 
   // 🔥 Koneksi ke Socket.IO + Listener Notifikasi
   void _connectSocket() {
+    // Gunakan host dari Config.apiBaseUrl dan bangun URL socket (http/https + host[:port])
+    final uri = Uri.parse(Config.apiBaseUrl);
+    final scheme = (uri.scheme == 'https') ? 'https' : 'http';
+    final hostPort = uri.hasPort ? '${uri.host}:${uri.port}' : uri.host;
+    final socketUrl = '$scheme://$hostPort';
+
     socket = IO.io(
-      'http://192.168.1.4:5000',
+      socketUrl,
       IO.OptionBuilder()
           .setTransports(['websocket'])
           .disableAutoConnect()
@@ -79,7 +86,8 @@ class _DashboardUserState extends State<DashboardUser> {
             message: data['message'] ?? '',
             color: Colors.orange,
             icon: Icons.notifications_active,
-            createdAt: DateTime.tryParse(data['createdAt'] ?? '') ?? DateTime.now(),
+            createdAt:
+                DateTime.tryParse(data['createdAt'] ?? '') ?? DateTime.now(),
           ),
         );
       });
@@ -100,10 +108,16 @@ class _DashboardUserState extends State<DashboardUser> {
     final List<Map<String, dynamic>> menuPages = [
       {"title": "Dashboard", "widget": const DashboardContent()},
       {"title": "Buat Laporan", "widget": LaporanBaruPage(token: widget.token)},
-      {"title": "Riwayat Laporan", "widget": RiwayatLaporanPage(token: widget.token)},
+      {
+        "title": "Riwayat Laporan",
+        "widget": RiwayatLaporanPage(token: widget.token),
+      },
       {
         "title": "Notifikasi",
-        "widget": NotifikasiUserPage(token: widget.token, notifications: notifications),
+        "widget": NotifikasiUserPage(
+          token: widget.token,
+          notifications: notifications,
+        ),
       },
     ];
 
@@ -214,7 +228,10 @@ class DashboardContent extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 6),
-          Text(title, style: const TextStyle(color: Colors.white70, fontSize: 14)),
+          Text(
+            title,
+            style: const TextStyle(color: Colors.white70, fontSize: 14),
+          ),
         ],
       ),
     );
