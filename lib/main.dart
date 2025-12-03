@@ -1,11 +1,19 @@
 import 'package:flutter/material.dart';
 import 'controllers/auth_controller.dart';
+import 'config.dart';
 import 'views/login_page.dart';
 import 'views/dashboard_admin.dart';
 import 'views/peta_interaktif_page.dart';
 import 'views/splash_page.dart';
 
 void main() {
+  // Jika ingin mengganti API base URL saat runtime, gunakan --dart-define:
+  // flutter run --dart-define=API_BASE_URL=http://192.168.1.4:5000
+  const envApi = String.fromEnvironment('API_BASE_URL', defaultValue: '');
+  if (envApi.isNotEmpty) {
+    Config.setBaseUrl(envApi);
+  }
+
   runApp(const MyApp());
 }
 
@@ -44,10 +52,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Jalan Aman',
-      theme: ThemeData(
-        primarySwatch: Colors.deepOrange,
-        useMaterial3: true,
-      ),
+      theme: ThemeData(primarySwatch: Colors.deepOrange, useMaterial3: true),
       home: FutureBuilder<Widget>(
         future: _getInitialPage(),
         builder: (context, snapshot) {
